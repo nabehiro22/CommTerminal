@@ -14,6 +14,7 @@ Built with [GPUI](https://github.com/zed-industries/zed/tree/main/crates/gpui) �
 - Copy log lines or selected text via Ctrl+C or right-click context menu
 - Color-coded log — configurable separate colors for sent and received data
 - Status bar showing current connection settings at a glance
+- Window position, size and maximized state restored on the next launch
 - Language switching (English / Japanese) via the settings screen
 - GPU-accelerated UI via GPUI (falls back to CPU rendering if no GPU is available)
 
@@ -49,14 +50,27 @@ Click **Text** or **Hex** to switch the log display:
 - **Text** — received bytes are decoded as UTF-8. Bytes that cannot form valid UTF-8 are shown as `�` (U+FFFD). Each entry ends with `↵` for a normal terminator, or `│` for a timeout.
 - **Hex** — all bytes are shown as space-separated 2-digit hex values (e.g. `41 42 43 0D 0A`).
 
+Switching between the two modes clears the current text selection. The rendered text differs between modes, so a selection made in one mode would not cover the same data in the other.
+
 ### Copying log data
 
+- **Ctrl+A** — selects every line currently held in the log
 - **Ctrl+C** — copies the selected text in the log area
 - **Right-click** — opens a context menu with "Copy Selection" and "Copy Line"
+
+While dragging to select text, moving the cursor outside the log area scrolls the view automatically, so a selection can be extended beyond what is currently visible.
 
 ### Log capacity
 
 The log retains up to **1,000 lines**. When this limit is reached, the oldest lines are removed automatically to make room for new ones.
+
+### Window position and size
+
+The window position, size and maximized state are saved when the application is closed, and restored the next time it starts. The monitor the window was displayed on is recorded as well, so on a multi-monitor setup the window reopens on the same monitor.
+
+If that monitor is no longer connected, or the saved position no longer fits on the screen, the window opens at the default position on the primary monitor.
+
+The state is written when the window is closed normally. It is not saved if the process is terminated forcibly, for example from Task Manager.
 
 ### Settings
 
@@ -108,7 +122,7 @@ When no terminator is configured, or when partial data arrives without a termina
 
 ### Settings file
 
-Settings are saved automatically to `config.toml` in the same folder as the executable. You can copy or back up this file to preserve your configuration.
+Settings are saved automatically to `config.toml` in the same folder as the executable. The window position, size, maximized state and the monitor in use are stored in the same file. You can copy or back up this file to preserve your configuration.
 
 ### Language
 
@@ -155,6 +169,7 @@ Windows向けのシンプルなシリアル・TCP通信ターミナルです。
 - ログの選択テキストまたは行単位でのコピー（Ctrl+C・右クリックメニュー）
 - 送信データと受信データをそれぞれ個別に色設定できるカラーログ
 - 現在の接続設定をひと目で確認できるステータスバー
+- 終了時のウィンドウ位置・サイズ・最大化状態を次回起動時に復元
 - 設定画面から表示言語を切り替え可能（日本語・英語）
 - GPUIによるGPU描画（GPU未搭載の場合はCPU描画で動作）
 
@@ -190,14 +205,27 @@ Hello{0D 0A}
 - **文字** — 受信バイト列をUTF-8として表示します。有効なUTF-8に変換できないバイトは `�`（U+FFFD）で表示されます。各行の末尾は終端文字による区切りの場合 `↵`、タイムアウトによる区切りの場合 `│` が付きます。
 - **16進** — すべてのバイトを16進数2桁のスペース区切りで表示します（例：`41 42 43 0D 0A`）。
 
+表示モードを切り替えると選択範囲は解除されます。モードによって表示される文字列が異なるため、一方で選択した範囲がもう一方では同じデータを指さなくなるためです。
+
 ### ログのコピー
 
+- **Ctrl+A** — ログに保持されている全行を選択します
 - **Ctrl+C** — ログエリアで選択したテキストをコピーします
 - **右クリック** — 「選択部をコピー」「行をコピー」のコンテキストメニューが表示されます
+
+ドラッグで範囲選択している間にマウスカーソルをログ表示エリアの外へ動かすと、表示が自動的にスクロールします。画面に見えていない範囲まで続けて選択できます。
 
 ### ログの最大行数
 
 ログは最大 **1,000行** まで保持されます。上限に達すると、新しいデータが来るたびに古い行から順に削除されます。
+
+### ウィンドウの位置とサイズ
+
+終了時のウィンドウ位置・サイズ・最大化状態を保存し、次回起動時に復元します。表示していたモニターも記録するため、マルチモニター環境でも同じモニターに復元されます。
+
+該当のモニターが接続されていない場合や、保存された位置が画面に収まらない場合は、プライマリモニターの既定位置に表示します。
+
+保存はウィンドウを通常の操作で閉じたときに行われます。タスクマネージャーからの強制終了などでは保存されません。
 
 ### 設定
 
@@ -249,7 +277,7 @@ Hello{0D 0A}
 
 ### 設定ファイル
 
-設定は実行ファイルと同じフォルダの `config.toml` に自動保存されます。このファイルをコピーまたはバックアップすることで設定を保持できます。
+設定は実行ファイルと同じフォルダの `config.toml` に自動保存されます。ウィンドウの位置・サイズ・最大化状態・表示していたモニターも同じファイルに保存されます。このファイルをコピーまたはバックアップすることで設定を保持できます。
 
 ### 言語設定
 
